@@ -8,4 +8,4 @@ To resolve this, we should extract the shared logic into a separate interface or
 
 ## Note - 
 - Here we are using constructor injection in vehicle class, this will help the child class to change the strategy at runtime.
-  
+- Here we can a new strategy without changing any structure and use it in any vehicle's child class.
