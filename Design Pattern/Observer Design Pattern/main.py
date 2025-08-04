@@ -9,10 +9,11 @@ if __name__ == "__main__":
 
     ob1 = MobileAlertObserver("98932", bagObservable)
     ob2 = EmailAlertObserver("xyz@gmail.com", iphoneObservable)
-
-    iphoneObservable.add(ob1)
-    iphoneObservable.add(ob2)
+    ob3 = EmailAlertObserver("xyz2@gmail.com", iphoneObservable)
+    
     bagObservable.add(ob1)
+    iphoneObservable.add(ob2)
+    iphoneObservable.add(ob3)
 
     iphoneObservable.setStockCount(10)
     bagObservable.setStockCount(20)
