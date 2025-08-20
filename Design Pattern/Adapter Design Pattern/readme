@@ -1,0 +1,11 @@
+### Main Gist - 
+
+The Adapter pattern is especially useful when:
+
+You already have an existing class with valuable functionality.
+
+Its interface doesn’t match what your new code/client expects.
+
+You don’t want to (or cannot) modify the original class (maybe it’s legacy, third-party, or closed-source).
+
+So, you write a wrapper (adapter) that translates between the expected interface and the existing functionality.
