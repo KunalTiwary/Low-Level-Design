@@ -1,5 +1,3 @@
-Render as:
-
 ### Concept - 
 General Flow of Object Creation - 
 
