@@ -32,3 +32,15 @@ Customizing __new__() for Singleton -
 
 ```python
 cls._conObject = super(DBConnection, cls).__new__(cls)
+```
+
+## Actual Usage
+
+- In a production environment, we often need multiple database connections (say 20–30) rather than a single instance. The Singleton pattern is still useful here because it ensures that there is only one connection pool manager in the application.
+
+- This manager (implemented as a Singleton) is responsible for creating and maintaining a fixed number of connections, and reusing them efficiently.
+
+- So, while the Singleton itself only restricts the pool manager to a single instance, the pool manager internally applies an Object Pool pattern to restrict the total number of DB connections (e.g., 20–30).
+
+
+
