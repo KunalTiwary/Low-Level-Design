@@ -4,7 +4,8 @@ It provides a simplified interface to a set of complex subsystems, making it eas
 Without facade → 
 1. Client has to deal with multiple classes and their complex interactions.
 2. If any new logic is changed/added/deleted, the client has to change its flow
-3. 
+
+We can create multiple sub-facades and use it, this is simplify the code even further
 
 ## Diff between facade and proxy -
 - Proxy can create the object of only one class
