@@ -1,5 +1,6 @@
 # The main part -
 <img width="604" height="331" alt="image" src="https://github.com/user-attachments/assets/70009b90-b97c-45ec-9e0c-df03dc90ac80" />
+
 In the image above, Implementor contains the logic (like strategy in strategy design pattern) and Abstraction just calls/uses the implementation (actual logic)
 
 
