@@ -20,9 +20,9 @@ if __name__ == "__main__":
     remote.set_command(set_temp_command)
     remote.press_button()
 
-    remote.press_undo()
+    remote.press_undo(1)
 
     remote.set_command(turn_off_command)
     remote.press_button()
 
-    remote.press_undo()
+    remote.press_undo(1)
