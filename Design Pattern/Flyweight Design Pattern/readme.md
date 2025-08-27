@@ -13,6 +13,6 @@ Shared stuff lives inside the flyweight → unique stuff is passed in when you u
 # Where to use it ?
 - When memory is limited
 - When objects share data -
-    Intrinsic Data: shared across objects and remain same once defined one value.
-    Extrinsic Data: changes based on client input and differs from one object to another.
+1) Intrinsic Data: shared across objects and remain same once defined one value.
+2) Extrinsic Data: changes based on client input and differs from one object to another.
 - Creation ob objects.
