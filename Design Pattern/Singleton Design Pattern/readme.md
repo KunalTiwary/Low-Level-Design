@@ -32,18 +32,6 @@ Customizing __new__() for Singleton -
 cls._conObject = super(DBConnection, cls).__new__(cls)
 ```
 
-## Actual Usage
-
-- In a production environment, we often need multiple database connections (say 20–30) rather than a single instance. The Singleton pattern is still useful here because it ensures that there is only one connection pool manager in the application.
-
-- This manager (implemented as a Singleton) is responsible for creating and maintaining a fixed number of connections, and reusing them efficiently.
-
-- So, while the Singleton itself only restricts the pool manager to a single instance, the pool manager internally applies an Object Pool pattern to restrict the total number of DB connections (e.g., 20–30).
-
-
-
-
-
 # Issues in Double Locking -
 Issue 1 - 
 This way we are putting locks here - 
@@ -72,3 +60,23 @@ This will help us because -
 - It will make sure that all the instructions before and after the volatile object creation will execute in the same group. In our case, step 3 is volatile so, step 1 and step 2 can be reordered by CPU but it has to be done before step 3 and written in memory.
 
 
+
+## Object pool design pattern
+
+- In a production environment, we often need multiple database connections (say 20–30) rather than a single instance. The Singleton pattern is still useful here because it ensures that there is only one connection pool manager in the application.
+
+- This manager (implemented as a Singleton) is responsible for creating and maintaining a fixed number of connections, and reusing them efficiently.
+
+- So, while the Singleton itself only restricts the pool manager to a single instance, the pool manager internally applies an Object Pool pattern to restrict the total number of DB connections (e.g., 20–30).
+
+Use this diagram with locks :
+<img width="979" height="367" alt="image" src="https://github.com/user-attachments/assets/37ffd3f9-20ed-46d8-a525-dde024527877" />
+
+### Advantages -
+- Reduces overhead and latency of creating and destroying highly CPU and memory intensive objects.
+- Controls the number of objects in a pool
+
+### Dis-Advantages - 
+- Resource leak can happen if not handled properly
+- Requires more memory for storing objects.
+- Adds complecity of managing pool
