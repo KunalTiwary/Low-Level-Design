@@ -79,4 +79,4 @@ Use this diagram with locks :
 ### Dis-Advantages - 
 - Resource leak can happen if not handled properly
 - Requires more memory for storing objects.
-- Adds complecity of managing pool
+- Adds complexity of managing pool
