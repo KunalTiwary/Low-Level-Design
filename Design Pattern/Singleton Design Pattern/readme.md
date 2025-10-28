@@ -44,7 +44,7 @@ Now to be precise when super(DBConnection, cls).__new__(cls) is called, there wi
 2) Initialize the member variables (if any)
 3) Return the address of the memory to cls._conObject
 
-But, for better performance CPU changes the order sometimes without changing the logic. In our case 1->2->3 can be executed in 1->3->2 order. Then, in the new order cls._conObject will have the object before initialization of member variables. Therefore, some other thread can use it without the  member variables which will cause some errors. 
+But, for better performance CPU changes the order without changing the logic. In our case 1->2->3 can be executed in 1->3->2 order. Then, in the new order cls._conObject will have the object before initialization of member variables. Therefore, some other thread can use it without the member variables which will cause some errors. 
 
 Issue 2 -
 In CPU we have different cores and each core has its own cache. The cores uses there own L1 cache and then write it to memory after sometime. Now, let's say thread 1 has already created the object and sitting in L1 cache of some particular core. Then, thread 2 is scheduled to a different core and but the object created by thread 1 is still not in memory so thread 2 will create one more object and store in it's core's L1 cache. 
