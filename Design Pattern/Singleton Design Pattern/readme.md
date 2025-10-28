@@ -59,7 +59,7 @@ This will help us because -
 - It ensures that nothing is written in L1 cache but everything is written in memory directly (Issue 2 is resolved).
 - It will make sure that all the instructions before and after the volatile object creation will execute in the same group. In our case, step 3 is volatile so, step 1 and step 2 can be reordered by CPU but it has to be done before step 3 and written in memory.
 
-
+In python we don't need volatile keyword as java because GIL takes care of these things
 
 ## Object pool design pattern
 
