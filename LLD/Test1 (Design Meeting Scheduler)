@@ -1,0 +1,243 @@
+
+
+from abc import ABC, abstractmethod
+from contextlib import ContextDecorator
+from datetime import datetime, timedelta
+import heapq
+import uuid
+
+
+class UserInt(ABC):
+    def __init__(self, name, id, uniqueNumber):
+        self.name = name
+        self.id = id
+        self.uniqueNumber = uniqueNumber
+
+
+class User(UserInt):
+    pass
+
+
+class Meeting:
+    def __init__(self, start: datetime, end: datetime, user: User):
+        self.start = start
+        self.end = end
+        self.user = user
+
+
+class MeetingRoomInt(ABC):
+    def __init__(self, id, capacity):
+        self.id = id
+        self.capacity = capacity
+
+    @abstractmethod
+    def addMeeting(self, meeting: Meeting):
+        pass
+
+    @abstractmethod
+    def removeMeeting(self, meeting: Meeting):
+        pass
+
+    @abstractmethod
+    def getMeeting(self):
+        pass
+
+    @abstractmethod
+    def removeOldMeeting(self):
+        pass
+
+
+class MeetingRoom(MeetingRoomInt):
+    def __init__(self, id, capacity):
+        super().__init__(id, capacity)
+        self.meetings = []
+        self.meetingEndHeap = [] # Min-heap of (end_time, meeting)
+
+    def addMeeting(self, meeting: Meeting):
+        self.removeOldMeeting()
+        if self.findConflict(meeting):
+            raise ValueError(f"Room {self.id} already booked during this time.")
+
+        heapq.heappush(self.meetingEndHeap, (meeting.end, meeting))
+        idx = 0
+        while idx < len(self.meetings) and self.meetings[idx].start < meeting.start:
+            idx += 1
+        self.meetings.insert(idx, meeting)
+
+    def findConflict(self, newMeeting: Meeting):
+        if not self.meetings:
+            return False
+        idx = 0
+        while idx < len(self.meetings) and self.meetings[idx].start < newMeeting.start:
+            idx += 1
+        if idx > 0 and self.meetings[idx - 1].end > newMeeting.start:
+            return True
+        if idx < len(self.meetings) and newMeeting.end > self.meetings[idx].start:
+            return True
+        return False
+
+    def removeMeeting(self, meeting: Meeting):
+        if meeting in self.meetings:
+            self.meetings.remove(meeting)
+        self.meetingEndHeap = [(m.end, m) for m in self.meetings]
+        heapq.heapify(self.meetingEndHeap)
+
+    def getMeeting(self):
+        self.removeOldMeeting()
+        return self.meetings
+
+    def removeOldMeeting(self):
+        now = datetime.now()
+        while self.meetingEndHeap and self.meetingEndHeap[0][0] < now:
+            endTime, expired = heapq.heappop(self.meetingEndHeap)
+            if expired in self.meetings:
+                self.meetings.remove(expired)
+
+
+class MeetingRoomController:
+    def __init__(self):
+        self.rooms = {}  # {capacity: {room_id: MeetingRoom}}
+
+    def createMeetingRooms(self, count: int, capacity: int):
+        self.rooms.setdefault(capacity, {})
+        for _ in range(count):
+            room_id = str(uuid.uuid4())[:6]
+            room = MeetingRoom(room_id, capacity)
+            self.rooms[capacity][room.id] = room
+
+    def getAllRooms(self):
+        return self.rooms
+
+    def getEmptyRooms(self, capacity: int, startTime: datetime, endTime: datetime):
+        if capacity not in self.rooms:
+            return []
+        emptyRooms = []
+        new_meeting_temp_obj = Meeting(startTime, endTime, user=None)
+        for room in self.rooms[capacity].values():
+            room.removeOldMeeting()
+            if not room.findConflict(new_meeting_temp_obj):
+                emptyRooms.append(room)
+        return emptyRooms
+
+    def deleteRoom(self, id: str, capacity: int):
+        if capacity in self.rooms and id in self.rooms[capacity]:
+            del self.rooms[capacity][id]
+
+
+class MeetingScheduler:
+    def __init__(self, meetingRoomController: MeetingRoomController):
+        self.meetingRoomController = meetingRoomController
+
+    def getEmptyMeetingRooms(self, capacity: int, startTime: datetime, endTime: datetime):
+        return self.meetingRoomController.getEmptyRooms(capacity, startTime, endTime)
+
+    def bookMeetingRoom(self, user: User, room: MeetingRoom, startTime: datetime, endTime: datetime):
+        meeting = Meeting(startTime, endTime, user)
+        room.addMeeting(meeting)
+        return True
+
+
+if __name__ == "__main__":
+    controller = MeetingRoomController()
+    controller.createMeetingRooms(3, 2)
+    controller.createMeetingRooms(3, 4)
+    scheduler = MeetingScheduler(controller)
+    emptyRooms = scheduler.getEmptyMeetingRooms(4, datetime.now(), datetime.now() + timedelta(minutes=1))
+    user = User("kunal", "21", 21)
+    scheduler.bookMeetingRoom(user, emptyRooms[0], datetime.now(), datetime.now() + timedelta(minutes=1))
+    emptyRooms = scheduler.getEmptyMeetingRooms(4, datetime.now() + timedelta(minutes=2), datetime.now() + timedelta(minutes=3))
+    print(emptyRooms)
+
+# Given a list of strings containing a name and a roman numeral, sort the list first by name, 
+# then by the decimal value of the roman numeral. Roman numerals follow these rules. 
+# A value is not repeated more than three times. When a smaller value precedes a larger value, 
+# it indicates subtraction. For any other two-digit numbers less than 50, concatenate the roman numerals 
+# that represent its multiples of tens with the roman numerals for its values less than 10. 
+# For example, if 43 is 40 plus 3, then XL plus III.
+
+def quickSort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr)//2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quickSort(left) + middle + quickSort(right)
+
+# print(quickSort([("kunal", 10), ("tiwary", 2), ("mayank", 50), ("tiwary", 100)]))
+
+def romanToInt(rom):
+    romanToInt = {
+        "I": 1,
+        "V": 5,
+        "X": 10,
+        "L": 50,
+        "C": 100,
+    }
+    total = 0
+    for i in range(len(rom)):
+        if i+1 < len(rom) and romanToInt[rom[i]] < romanToInt[rom[i+1]]:
+            total -= romanToInt[rom[i]]
+        else:
+            total += romanToInt[rom[i]]
+    return total
+
+
+
+# The company plans to launch marketing campaigns every several weeks. 
+# Each campaign has a certain cost, and at least one campaign must be launched every week. 
+# The weekly input is defined as the maximum cost of any campaign planned for that week. 
+# Given an area of campaign costs and number of weeks, determine the minimum possible sum of weekly inputs when campaigns are optimally planned. 
+# The campaign must remain in the original order. Each campaign must be launched in exactly one week and cannot be skipped.
+# costs = [1,2,3,4,5]
+# k = 2
+# output = 13
+
+# costs = [10, 20, 30, 40, 50]
+# k = 2
+# output = 60
+
+
+# Solution - 
+
+def getMinCost(costs, target):
+    dp = {}
+    target = target-1
+    def helper(i, j, counter):
+        if counter == target:
+            return max(costs[i:j+1])
+        if (i, j, counter) in dp:
+            return dp[(i, j, counter)]
+        mini = float("inf")
+        for k in range(i, j):
+            partition = max(costs[i:k+1])
+            mini = min(mini, helper(k+1, j, counter+1)+partition)
+        dp[(i, j, counter)] = mini
+        return dp[(i, j, counter)]
+    return helper(0, len(costs)-1, 0)
+
+
+# print(getMinCost(costs, k))
+
+
+# Part of a development team will generate M microservices. 
+# The data system reports whether each service passed Y or failed N in its health checks. 
+# Find the longest streak of consecutive days during which all services passed their checks.
+
+# micro = [1,1,1,0,0,1,0,1,1,1,1,1,1]
+
+# def countPassed(micro):
+#     count = 0
+#     maxi = float("-inf")
+#     for m in micro:
+#         if m == 0:
+#             count = 0
+#         else:
+#             count += 1
+#         maxi = max(maxi, count)
+#     return maxi
+
+# print(countPassed(micro))
+
+
+
